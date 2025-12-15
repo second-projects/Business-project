@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [voucherCode, setVoucherCode] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -19,8 +21,13 @@ export default function Home() {
         body: JSON.stringify({ code: voucherCode }),
       });
 
-      const data = await res.json();
-      setMessage(data.message);
+      if (res.ok) {
+        localStorage.setItem("voucherCode", voucherCode);
+        router.push("/display");
+      } else {
+        const data = await res.json();
+        setMessage(data.message);
+      }
     } catch (error) {
       setMessage("An error occurred. Please try again.");
     } finally {
